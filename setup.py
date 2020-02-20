@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='dst0gui',
+setup(name='dst-gui',
       version='0.1',
       description="Web based GUI for Don't Starve Togther Server Management",
       url='http://github.com/combatwombat16/dst-gui',
