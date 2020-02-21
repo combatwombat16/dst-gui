@@ -10,6 +10,7 @@ setup(name='dst-gui',
       packages=[],
       install_requires=[
           'flask',
-          'react'
+          'react',
+          'marshmallow'
       ],
       zip_safe=False)

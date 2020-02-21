@@ -1,9 +1,19 @@
-from org.combatwombat.dst.config.server.Network import Network
-from org.combatwombat.dst.config.server.Shard import Shard
-from org.combatwombat.dst.config.server.Steam import Steam
+from org.combatwombat.dst.config.server.Network import Network, NetworkSchema
+from org.combatwombat.dst.config.server.Shard import Shard, ShardSchema
+from org.combatwombat.dst.config.server.Steam import Steam, SteamSchema
 from configparser import ConfigParser
 from os import path
-import json
+from marshmallow import Schema, fields
+
+
+class ServerSchema(Schema):
+    network = fields.Nested(NetworkSchema)
+    shard = fields.Nested(ShardSchema)
+    steam = fields.Nested(SteamSchema)
+
+    #@post_load
+    #def make_server(self, data, **kwargs):
+    #    return
 
 
 class Server:
@@ -41,7 +51,5 @@ class Server:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        dict_to_return = {"NETWORK": self.network.__dict__
-                          , "SHARD": self.shard.__dict__
-                          , "STEAM": self.steam.__dict__}
-        return json.dumps(dict_to_return, indent=4)
+        return ServerSchema().dumps(self)
+        

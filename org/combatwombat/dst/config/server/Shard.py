@@ -1,6 +1,7 @@
 from configparser import NoOptionError, ConfigParser
 from random import random
 import json
+from marshmallow import Schema, fields, post_load
 
 
 class Shard:
@@ -54,4 +55,15 @@ class Shard:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return ShardSchema().dumps(self)
+        #return json.dumps(self.__dict__, indent=4)
+
+
+class ShardSchema(Schema):
+    is_master = fields.Boolean()
+    name = fields.Str()
+    shard_id = fields.Integer()
+
+    @post_load
+    def make_shard(self, data, **kwargs):
+        return Shard(**data)

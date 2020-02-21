@@ -1,5 +1,6 @@
 from configparser import NoOptionError, ConfigParser
 import json
+from marshmallow import Schema, fields, post_load
 
 
 class Network:
@@ -39,4 +40,15 @@ class Network:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return NetworkSchema().dumps(self)
+        #return json.dumps(self.__dict__, indent=4)
+
+
+class NetworkSchema(Schema):
+    port = fields.Integer()
+
+    @post_load
+    def make_network(self, data, **kwargs):
+        return Network(**data)
+
+

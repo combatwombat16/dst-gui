@@ -1,5 +1,6 @@
 from configparser import NoOptionError, ConfigParser
 import json
+from marshmallow import Schema, fields, post_load
 
 
 class Steam:
@@ -39,4 +40,16 @@ class Steam:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return SteamSchema().dumps(self)
+        #return json.dumps(self.__dict__, indent=4)
+
+
+class SteamSchema(Schema):
+    authentication_port = fields.Integer()
+    master_server_port = fields.Integer()
+
+    @post_load
+    def make_steam(self, data, **kwargs):
+        return Steam(**data)
+
+
