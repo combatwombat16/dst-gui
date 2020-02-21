@@ -1,5 +1,6 @@
 from configparser import ConfigParser, NoOptionError
-import json
+from marshmallow import Schema, fields, post_load
+
 
 
 class Shard:
@@ -75,4 +76,16 @@ class Shard:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return ShardSchema().dumps(self)
+
+
+class ShardSchema(Schema):
+    shard_enabled = fields.Boolean()
+    bind_ip = fields.String()
+    master_ip = fields.String()
+    master_port = fields.Integer()
+    cluster_key = fields.String()
+
+    @post_load
+    def make_shard(self, data, **kwargs):
+        return Shard(**data)

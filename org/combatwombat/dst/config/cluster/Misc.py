@@ -1,5 +1,5 @@
 from configparser import ConfigParser, NoOptionError
-import json
+from marshmallow import Schema, fields, post_load
 
 
 class Misc:
@@ -39,4 +39,13 @@ class Misc:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return MiscSchema().dumps(self)
+
+
+class MiscSchema(Schema):
+    max_snapshots = fields.Integer()
+    console_enabled = fields.Boolean()
+
+    @post_load
+    def make_misc(self, data, **kwargs):
+        return Misc(**data)

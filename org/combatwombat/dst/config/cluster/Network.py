@@ -1,6 +1,6 @@
 from configparser import ConfigParser, NoOptionError
 from enum import Enum
-import json
+from marshmallow import Schema, fields, post_load
 
 
 class Intention(Enum):
@@ -137,4 +137,20 @@ class Network:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return NetworkSchema().dumps(self)
+
+
+class NetworkSchema(Schema):
+    offline_server = fields.Boolean()
+    tick_rate = fields.Integer()
+    whitelist_slots = fields.Integer()
+    cluster_password = fields.String()
+    cluster_name = fields.String()
+    cluster_description = fields.String()
+    lan_only_cluster = fields.Boolean()
+    cluster_intention = fields.String()
+    autosaver_enabled = fields.Boolean()
+
+    @post_load
+    def make_network(self, data, **kwargs):
+        return Network(**data)

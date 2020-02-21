@@ -1,18 +1,22 @@
-from org.combatwombat.dst.config.cluster.Gameplay import Gameplay
-from org.combatwombat.dst.config.cluster.Misc import Misc
-from org.combatwombat.dst.config.cluster.Network import Network
-from org.combatwombat.dst.config.cluster.Steam import Steam
-from org.combatwombat.dst.config.cluster.Shard import Shard
+from org.combatwombat.dst.config.cluster.Gameplay import Gameplay, GameplaySchema
+from org.combatwombat.dst.config.cluster.Misc import Misc, MiscSchema
+from org.combatwombat.dst.config.cluster.Network import Network, NetworkSchema
+from org.combatwombat.dst.config.cluster.Steam import Steam, SteamSchema
+from org.combatwombat.dst.config.cluster.Shard import Shard, ShardSchema
 from os import path
 from configparser import ConfigParser
-import json
+from marshmallow import Schema, fields, post_load
 
 
 class Cluster:
     """Cluster configuration class for Don't Starve Together.
 
     Args:
-        cluster_file (str): Path to cluster.ini file for a DST cluster.
+        gameplay (Gameplay): Gameplay configuration section.
+        misc (Misc): Misc configuration section.
+        network (Network): Network configuration section.
+        shard (Shard): Shard configuration section.
+        steam (Steam): Steam configuration section.
 
     Attributes:
         gameplay (Gameplay): Gameplay configuration section.
@@ -22,16 +26,12 @@ class Cluster:
         steam (Steam): Steam configuration section.
     """
 
-    def __init__(self, cluster_file=None):
-        config = ConfigParser()
-        if cluster_file is not None:
-            if path.exists(cluster_file):
-                config.read(cluster_file)
-        self.gameplay = Gameplay(conf=config)
-        self.misc = Misc(conf=config)
-        self.network = Network(conf=config)
-        self.shard = Shard(conf=config)
-        self.steam = Steam(conf=config)
+    def __init__(self, gameplay=Gameplay(), misc=Misc(), network=Network(), shard=Shard(), steam=Steam()):
+        self.gameplay = gameplay
+        self.misc = misc
+        self.network = network
+        self.shard = shard
+        self.steam = steam
 
     def write_ini(self, file):
         """Write configuration data to specified file path
@@ -50,9 +50,16 @@ class Cluster:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        dict_to_return = {"GAMEPLAY": self.gameplay.__dict__
-                          , "MISC": self.misc.__dict__
-                          , "NETWORK": self.network.__dict__
-                          , "SHARD": self.shard.__dict__
-                          , "STEAM": self.steam.__dict__}
-        return json.dumps(dict_to_return, indent=4)
+        return ClusterSchema().dumps(self)
+
+
+class ClusterSchema(Schema):
+    network = fields.Nested(NetworkSchema, load_from="network")
+    shard = fields.Nested(ShardSchema, load_from="shard")
+    steam = fields.Nested(SteamSchema, load_from="steam")
+    gameplay = fields.Nested(GameplaySchema, load_from="gameplay")
+    misc = fields.Nested(MiscSchema, load_from="misc")
+
+    @post_load
+    def make_cluster(self, data, **kwargs):
+        return Cluster(**data)

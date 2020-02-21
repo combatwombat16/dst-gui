@@ -1,6 +1,6 @@
 from configparser import ConfigParser, NoOptionError
 from enum import Enum
-import json
+from marshmallow import Schema, fields, post_load
 
 
 class GameMode(Enum):
@@ -89,4 +89,16 @@ class Gameplay:
 
     def to_json(self):
         """Turns configuration class into JSON"""
-        return json.dumps(self.__dict__, indent=4)
+        return GameplaySchema().dumps(self)
+
+
+class GameplaySchema(Schema):
+    max_players = fields.Integer()
+    pvp = fields.Boolean()
+    game_mode = fields.String()
+    pause_when_empty = fields.Boolean()
+    vote_kick_enabled = fields.Boolean()
+
+    @post_load
+    def make_gameplay(self, data, **kwargs):
+        return Gameplay(**data)

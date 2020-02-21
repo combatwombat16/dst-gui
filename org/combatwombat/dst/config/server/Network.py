@@ -1,5 +1,3 @@
-from configparser import NoOptionError, ConfigParser
-import json
 from marshmallow import Schema, fields, post_load
 
 
@@ -8,7 +6,6 @@ class Network:
 
     Args:
         port (int): The UDP port that this server will listen for connections on.
-        conf (ConfigParser):    Configuration information optionally passed in if it already exists.
 
     Attributes:
         server_port (int): The UDP port that this server will listen for connections on.
@@ -17,21 +14,15 @@ class Network:
             to see it in their server listing.
             Ports below 1024 are restricted to privileged users on some operating systems.
     """
-    def __init__(self, port=10999, conf=ConfigParser()):
-        if not conf.has_section("NETWORK"):
-            self.server_port = self.check_port_validity(port)
-        else:
-            try:
-                self.server_port = self.check_port_validity(conf.get("NETWORK", "server_port"))
-            except NoOptionError:
-                self.server_port = self.check_port_validity(port)
+    def __init__(self, port=10999):
+        self.server_port = self.__check_port_validity(port)
 
     def set_config(self, config):
         if not config.has_section("NETWORK"):
             config.add_section("NETWORK")
         config.set("NETWORK", "server_port", str(self.server_port))
 
-    def check_port_validity(self, port_to_check):
+    def __check_port_validity(self, port_to_check):
         """Check whether the server port is within the valid range"""
         if 10998 <= port_to_check <= 11018:
             return port_to_check
@@ -41,7 +32,6 @@ class Network:
     def to_json(self):
         """Turns configuration class into JSON"""
         return NetworkSchema().dumps(self)
-        #return json.dumps(self.__dict__, indent=4)
 
 
 class NetworkSchema(Schema):

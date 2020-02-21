@@ -1,6 +1,4 @@
-from configparser import NoOptionError, ConfigParser
 from random import random
-import json
 from marshmallow import Schema, fields, post_load
 
 
@@ -11,7 +9,6 @@ class Shard:
         is_master (bool):   Sets a shard to be the master shard for a cluster.
         name (str):   This is the name of the shard that will show up in log files.
         shard_id (int):  This is field is automatically generated for non-master servers.
-        conf (ConfigParser):    Configuration information optionally passed in if it already exists.
 
     Attributes:
         is_master (bool):   Sets a shard to be the master shard for a cluster.
@@ -26,24 +23,10 @@ class Shard:
             Altering this or removing it may cause problems on your server if anybody’s
             character currently resides in the world that this server manages.
     """
-    def __init__(self, is_master=True, name="", shard_id=random(), conf=ConfigParser()):
-        if not conf.has_section("SHARD"):
-            self.is_master = is_master
-            self.name = name
-            self.id = shard_id if (self.is_master is None) else None
-        else:
-            try:
-                self.is_master = conf.get("SHARD", "is_master")
-            except NoOptionError:
-                self.is_master = is_master
-            try:
-                self.name = conf.get("SHARD", "name")
-            except NoOptionError:
-                self.name = name
-            try:
-                self.id = conf.get("SHARD", "id")
-            except NoOptionError:
-                self.id = shard_id
+    def __init__(self, is_master=True, name="", shard_id=random()):
+        self.is_master = is_master
+        self.name = name
+        self.id = shard_id if (self.is_master is None) else None
 
     def set_config(self, config):
         """Sets config object with configurations from this class"""
@@ -56,7 +39,6 @@ class Shard:
     def to_json(self):
         """Turns configuration class into JSON"""
         return ShardSchema().dumps(self)
-        #return json.dumps(self.__dict__, indent=4)
 
 
 class ShardSchema(Schema):
