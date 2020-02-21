@@ -7,7 +7,7 @@ setup(name='dst-gui',
       author='Ben Abrams',
       author_email='combatwombat16@gmail.com',
       license='MIT',
-      packages=['dst-gui'],
+      packages=[],
       install_requires=[
           'flask',
           'react'

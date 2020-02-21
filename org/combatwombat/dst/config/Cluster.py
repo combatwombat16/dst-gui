@@ -5,6 +5,7 @@ from org.combatwombat.dst.config.cluster.Steam import Steam
 from org.combatwombat.dst.config.cluster.Shard import Shard
 from os import path
 from configparser import ConfigParser
+import json
 
 
 class Cluster:
@@ -20,6 +21,7 @@ class Cluster:
         shard (Shard): Shard configuration section.
         steam (Steam): Steam configuration section.
     """
+
     def __init__(self, cluster_file=None):
         config = ConfigParser()
         if cluster_file is not None:
@@ -45,3 +47,12 @@ class Cluster:
             self.gameplay.set_config(config)
             self.misc.set_config(config)
             config.write(iniFile)
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        dict_to_return = {"GAMEPLAY": self.gameplay.__dict__
+                          , "MISC": self.misc.__dict__
+                          , "NETWORK": self.network.__dict__
+                          , "SHARD": self.shard.__dict__
+                          , "STEAM": self.steam.__dict__}
+        return json.dumps(dict_to_return, indent=4)

@@ -3,6 +3,7 @@ from org.combatwombat.dst.config.server.Shard import Shard
 from org.combatwombat.dst.config.server.Steam import Steam
 from configparser import ConfigParser
 from os import path
+import json
 
 
 class Server:
@@ -37,3 +38,10 @@ class Server:
             self.shard.set_config(write_config)
             self.steam.set_config(write_config)
             write_config.write(iniFile)
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        dict_to_return = {"NETWORK": self.network.__dict__
+                          , "SHARD": self.shard.__dict__
+                          , "STEAM": self.steam.__dict__}
+        return json.dumps(dict_to_return, indent=4)

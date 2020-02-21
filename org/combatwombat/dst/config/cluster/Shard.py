@@ -1,4 +1,5 @@
 from configparser import ConfigParser, NoOptionError
+import json
 
 
 class Shard:
@@ -32,8 +33,8 @@ class Shard:
             this value must be the same on each machine.
             For servers running on the same machine, you can just set this once in cluster.ini.
     """
-    def __init__(self, shard_enabled=False, bind_ip="127.0.0.1", master_ip=None
-                 , master_port=10888, cluster_key=None, conf=ConfigParser()):
+    def __init__(self, shard_enabled=False, bind_ip="127.0.0.1", master_ip="127.0.0.1"
+                 , master_port=10888, cluster_key="", conf=ConfigParser()):
         if not conf.has_section("SHARD"):
             self.shard_enabled = shard_enabled
             self.bind_ip = bind_ip
@@ -66,8 +67,12 @@ class Shard:
         """Sets config object with configurations from this class"""
         if not config.has_section("SHARD"):
             config.add_section("SHARD")
-        config.set("SHARD", "shard_enabled", self.shard_enabled)
+        config.set("SHARD", "shard_enabled", str(self.shard_enabled))
         config.set("SHARD", "bind_ip", self.bind_ip)
         config.set("SHARD", "master_ip", self.master_ip)
-        config.set("SHARD", "master_port", self.master_port)
+        config.set("SHARD", "master_port", str(self.master_port))
         config.set("SHARD", "cluster_key", self.cluster_key)
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

@@ -1,4 +1,5 @@
 from configparser import ConfigParser, NoOptionError
+import json
 
 
 class Steam:
@@ -41,6 +42,10 @@ class Steam:
         """Sets config object with configurations from this class"""
         if not config.has_section("STEAM"):
             config.add_section("STEAM")
-        config.set("STEAM", "steam_group_only", self.steam_group_only)
-        config.set("STEAM", "steam_group_id", self.steam_group_id)
-        config.set("STEAM", "steam_group_admins", self.steam_group_admins)
+        config.set("STEAM", "steam_group_only", str(self.steam_group_only))
+        config.set("STEAM", "steam_group_id", str(self.steam_group_id))
+        config.set("STEAM", "steam_group_admins", str(self.steam_group_admins))
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

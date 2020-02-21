@@ -1,3 +1,6 @@
+# Top level ini for testing
+*.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

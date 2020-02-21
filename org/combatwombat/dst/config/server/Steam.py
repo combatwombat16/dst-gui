@@ -1,4 +1,5 @@
 from configparser import NoOptionError, ConfigParser
+import json
 
 
 class Steam:
@@ -33,5 +34,9 @@ class Steam:
         """Sets config object with configurations from this class"""
         if not config.has_section("STEAM"):
             config.add_section("STEAM")
-        config.set("STEAM", "authentication_port", self.authentication_port)
-        config.set("STEAM", "master_server_port", self.master_server_port)
+        config.set("STEAM", "authentication_port", str(self.authentication_port))
+        config.set("STEAM", "master_server_port", str(self.master_server_port))
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

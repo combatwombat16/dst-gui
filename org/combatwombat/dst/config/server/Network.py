@@ -1,4 +1,5 @@
 from configparser import NoOptionError, ConfigParser
+import json
 
 
 class Network:
@@ -35,3 +36,7 @@ class Network:
             return port_to_check
         else:
             raise ValueError("Port assignment outside of valid range, 10998-11018.\n Port provided: {}".format(port_to_check))
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

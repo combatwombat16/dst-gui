@@ -1,5 +1,6 @@
 from configparser import ConfigParser, NoOptionError
 from enum import Enum
+import json
 
 
 class GameMode(Enum):
@@ -80,8 +81,12 @@ class Gameplay:
         """Sets config object with configurations from this class"""
         if not config.has_section("GAMEPLAY"):
             config.add_section("GAMEPLAY")
-        config.set("GAMEPLAY", "max_players", self.max_players)
-        config.set("GAMEPLAY", "pvp", self.pvp)
+        config.set("GAMEPLAY", "max_players", str(self.max_players))
+        config.set("GAMEPLAY", "pvp", str(self.pvp))
         config.set("GAMEPLAY", "game_mode", self.game_mode)
-        config.set("GAMEPLAY", "pause_when_empty", self.pause_when_empty)
-        config.set("GAMEPLAY", "vote_kick_enabled", self.vote_kick_enabled)
+        config.set("GAMEPLAY", "pause_when_empty", str(self.pause_when_empty))
+        config.set("GAMEPLAY", "vote_kick_enabled", str(self.vote_kick_enabled))
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

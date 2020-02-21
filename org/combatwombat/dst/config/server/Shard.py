@@ -1,5 +1,6 @@
 from configparser import NoOptionError, ConfigParser
 from random import random
+import json
 
 
 class Shard:
@@ -24,7 +25,7 @@ class Shard:
             Altering this or removing it may cause problems on your server if anybody’s
             character currently resides in the world that this server manages.
     """
-    def __init__(self, is_master=None, name=None, shard_id=random(), conf=ConfigParser()):
+    def __init__(self, is_master=True, name="", shard_id=random(), conf=ConfigParser()):
         if not conf.has_section("SHARD"):
             self.is_master = is_master
             self.name = name
@@ -47,6 +48,10 @@ class Shard:
         """Sets config object with configurations from this class"""
         if not config.has_section("SHARD"):
             config.add_section("SHARD")
-        config.set("SHARD", "is_master", self.is_master)
+        config.set("SHARD", "is_master", str(self.is_master))
         config.set("SHARD", "name", self.name)
-        config.set("SHARD", "id", self.id)
+        config.set("SHARD", "id", str(self.id))
+
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)

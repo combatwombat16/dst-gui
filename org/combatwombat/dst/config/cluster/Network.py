@@ -1,5 +1,6 @@
 from configparser import ConfigParser, NoOptionError
 from enum import Enum
+import json
 
 
 class Intention(Enum):
@@ -44,6 +45,7 @@ class Network:
         cluster_description (str):  Cluster description.
         cluster_intention (str):   The cluster’s playstyle.
         lan_only_cluster (bool):   The server will only accept connections from machines on the same LAN
+        autosaver_enabled (bool): Automatically save state at end of each game day.
         conf (ConfigParser):    Configuration information optionally passed in if it already exists.
 
     Attributes:
@@ -65,10 +67,12 @@ class Network:
             This field is the equivalent of the “Server Playstyle” field on the “Host Game” screen.
             Valid values are cooperative, competitive, social, or madness.
         lan_only_cluster (bool):   The server will only accept connections from machines on the same LAN
+        autosaver_enabled (bool): Automatically save state at end of each game day.
+            The game will still save on shutdown, and can be manually saved using c_save().
     """
-    def __init__(self, offline_server=False, tick_rate=TickRate.fifteen.value, whitelist_slots=0, cluster_password=None
+    def __init__(self, offline_server=False, tick_rate=TickRate.fifteen.value, whitelist_slots=0, cluster_password=""
                  , cluster_name="", cluster_description="", lan_only_cluster=False
-                 , cluster_intention=Intention.cooperative.value, conf=ConfigParser()):
+                 , cluster_intention=Intention.cooperative.value, autosaver_enabled=True, conf=ConfigParser()):
         if not conf.has_section("NETWORK"):
             self.offline_server = offline_server
             self.tick_rate = tick_rate
@@ -78,6 +82,7 @@ class Network:
             self.cluster_description = cluster_description
             self.lan_only_cluster = lan_only_cluster
             self.cluster_intention = cluster_intention
+            self.autosaver_enabled = autosaver_enabled
         else:
             try:
                 self.offline_server = conf.getboolean("NETWORK", "offline_server")
@@ -111,18 +116,25 @@ class Network:
                 self.cluster_intention = conf.get("NETWORK", "cluster_intention")
             except NoOptionError:
                 self.cluster_intention = cluster_intention
+            try:
+                self.autosaver_enabled = conf.get("NETWORK", "autosaver_enabled")
+            except NoOptionError:
+                self.autosaver_enabled = autosaver_enabled
 
     def set_config(self, config):
         """Sets config object with configurations from this class"""
         if not config.has_section("NETWORK"):
             config.add_section("NETWORK")
-        config.set("NETWORK", "offline_server", self.offline_server)
-        config.set("NETWORK", "tick_rate", self.tick_rate)
-        config.set("NETWORK", "whitelist_slots", self.whitelist_slots)
+        config.set("NETWORK", "offline_server", str(self.offline_server))
+        config.set("NETWORK", "tick_rate", str(self.tick_rate))
+        config.set("NETWORK", "whitelist_slots", str(self.whitelist_slots))
         config.set("NETWORK", "cluster_password", self.cluster_password)
         config.set("NETWORK", "cluster_name", self.cluster_name)
         config.set("NETWORK", "cluster_description", self.cluster_description)
-        config.set("NETWORK", "lan_only_cluster", self.lan_only_cluster)
+        config.set("NETWORK", "lan_only_cluster", str(self.lan_only_cluster))
         config.set("NETWORK", "cluster_intention", self.cluster_intention)
+        config.set("NETWORK", "autosaver_enabled", str(self.autosaver_enabled))
 
-
+    def to_json(self):
+        """Turns configuration class into JSON"""
+        return json.dumps(self.__dict__, indent=4)
