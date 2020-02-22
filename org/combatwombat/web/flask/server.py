@@ -1,11 +1,23 @@
 from flask import Flask, request, jsonify, Blueprint
 from org.combatwombat.dst.config.Server import Server, ServerSchema
 from org.combatwombat.dst.config.Cluster import Cluster, ClusterSchema
+from org.combatwombat.web.flask import settings
 from configparser import ConfigParser
 from os import path
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+
+def configure_app(flask_app):
+    flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
+
+
+def initialize_app(flask_app):
+    configure_app(flask_app)
+
+    blueprint = Blueprint('api', __name__, url_prefix='/api')
+    flask_app.register_blueprint(blueprint)
 
 
 @app.route('/')
@@ -121,3 +133,14 @@ def server_read():
         server = Server()
 
     return server.to_json()
+
+
+def main():
+    initialize_app(app)
+    app.run(debug=settings.FLASK_DEBUG)
+
+
+if __name__ == "__main__":
+    main()
+
+
