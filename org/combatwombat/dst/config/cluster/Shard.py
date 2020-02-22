@@ -1,4 +1,3 @@
-from configparser import ConfigParser, NoOptionError
 from marshmallow import Schema, fields, post_load
 
 
@@ -12,7 +11,6 @@ class Shard:
         master_ip (str):    IP address that a non-master shard will use when trying to connect to the master shard.
         master_port (int):  UDP port that the master server will listen on or a shard will connect to.
         cluster_key (str):  Password used to authenticate a slave server to the master.
-        conf (ConfigParser):    Configuration information optionally passed in if it already exists.
 
     Attributes:
         shard_enabled (bool):   Enable server sharding.
@@ -34,35 +32,12 @@ class Shard:
             this value must be the same on each machine.
             For servers running on the same machine, you can just set this once in cluster.ini.
     """
-    def __init__(self, shard_enabled=False, bind_ip="127.0.0.1", master_ip="127.0.0.1"
-                 , master_port=10888, cluster_key="", conf=ConfigParser()):
-        if not conf.has_section("SHARD"):
-            self.shard_enabled = shard_enabled
-            self.bind_ip = bind_ip
-            self.master_ip = master_ip
-            self.master_port = master_port
-            self.cluster_key = cluster_key
-        else:
-            try:
-                self.shard_enabled = conf.getboolean("SHARD", "shard_enabled")
-            except NoOptionError:
-                self.shard_enabled = shard_enabled
-            try:
-                self.bind_ip = conf.get("SHARD", "bind_ip")
-            except NoOptionError:
-                self.bind_ip = bind_ip
-            try:
-                self.master_ip = conf.get("SHARD", "master_ip")
-            except NoOptionError:
-                self.master_ip = master_ip
-            try:
-                self.master_port = conf.getint("SHARD", "master_port")
-            except NoOptionError:
-                self.master_port = master_port
-            try:
-                self.cluster_key = conf.get("SHARD", "cluster_key")
-            except NoOptionError:
-                self.cluster_key = cluster_key
+    def __init__(self, shard_enabled=False, bind_ip="127.0.0.1", master_ip="127.0.0.1", master_port=10888, cluster_key=""):
+        self.shard_enabled = shard_enabled
+        self.bind_ip = bind_ip
+        self.master_ip = master_ip
+        self.master_port = master_port
+        self.cluster_key = cluster_key
 
     def set_config(self, config):
         """Sets config object with configurations from this class"""
@@ -81,7 +56,7 @@ class Shard:
 
 class ShardSchema(Schema):
     shard_enabled = fields.Boolean()
-    bind_ip = fields.String()
+    bind_ip = fields.String(required=True)
     master_ip = fields.String()
     master_port = fields.Integer()
     cluster_key = fields.String()

@@ -1,4 +1,3 @@
-from configparser import ConfigParser, NoOptionError
 from marshmallow import Schema, fields, post_load
 
 
@@ -8,7 +7,6 @@ class Misc:
     Args:
         max_snapshots (int):    Maximum number of snapshots to retain.
         console_enabled (bool): Allow lua commands to be entered in the command prompt or terminal.
-        conf (ConfigParser):    Configuration information optionally passed in if it already exists.
 
     Attributes:
         max_snapshots (int):    Maximum number of snapshots to retain.
@@ -16,19 +14,9 @@ class Misc:
             Snapshots are available in the “Rollback” tab on the “Host Game” screen.
         console_enabled (bool): Allow lua commands to be entered in the command prompt or terminal.
     """
-    def __init__(self, max_snapshots=6, console_enabled=True, conf=ConfigParser()):
-        if not conf.has_section("MISC"):
-            self.max_snapshots = max_snapshots
-            self.console_enabled = console_enabled
-        else:
-            try:
-                self.max_snapshots = conf.getint("MISC", "max_snapshots")
-            except NoOptionError:
-                self.max_snapshots = max_snapshots
-            try:
-                self.console_enabled = conf.getint("MISC", "console_enabled")
-            except NoOptionError:
-                self.console_enabled = console_enabled
+    def __init__(self, max_snapshots=6, console_enabled=True):
+        self.max_snapshots = max_snapshots
+        self.console_enabled = console_enabled
 
     def set_config(self, config):
         """Sets config object with configurations from this class"""

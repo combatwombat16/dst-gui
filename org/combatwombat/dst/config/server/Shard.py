@@ -43,7 +43,7 @@ class Shard:
 
 class ShardSchema(Schema):
     is_master = fields.Boolean()
-    name = fields.Str()
+    name = fields.Str(required=True)
     shard_id = fields.Integer()
 
     @post_load

@@ -31,8 +31,8 @@ class Steam:
 
 
 class SteamSchema(Schema):
-    authentication_port = fields.Integer()
-    master_server_port = fields.Integer()
+    authentication_port = fields.Integer(required=True)
+    master_server_port = fields.Integer(required=True)
 
     @post_load
     def make_steam(self, data, **kwargs):
